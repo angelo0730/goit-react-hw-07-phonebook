@@ -1,26 +1,43 @@
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import { getContacts, getFilter } from 'redux/selectors';
-import ContactItem from '../ContactItem/ContactItem';
+// prettier-ignore
+import { selectFilteredContacts, selectError, selectIsLoading } from '../../redux/contacts/contactsSelector';
+import { fetchContacts } from '../../redux/contacts/contactsOperation';
+import { ContactListItem } from './ContactListItem/ContactListItem';
+import { Loader } from 'components/Loader/Loader';
 
-const getFilteredContacts = (contacts, filter) => {
-  const normalizedFilter = filter.toLowerCase();
-  return contacts.filter(contact =>
-    contact.name.toLowerCase().includes(normalizedFilter)
-  );
-};
+export const ContactList = () => {
+  const filteredContacts = useSelector(selectFilteredContacts);
+  const error = useSelector(selectError);
+  const isLoading = useSelector(selectIsLoading);
 
-function ContactList() {
-  const contacts = useSelector(getContacts);
-  const filter = useSelector(getFilter);
-  const filteredContacts = getFilteredContacts(contacts, filter);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
 
   return (
     <ul>
-      {filteredContacts.map(({ id, name, number }) => (
-        <ContactItem key={id} contact={{ id, name, number }} />
-      ))}
+      {/* if loading and not error, show Loader */}
+      {isLoading && !error && <Loader />}
+
+      {/* if not loading, not error and filtered contacts is empty, show warning */}
+      {!isLoading && !error && filteredContacts.length === 0 && (
+        <p>The Phonebook is empty. Please add a contact</p>
+      )}
+
+      {/* if not loading, not error and have atleast 1 filtered contact, show ContactListItem */}
+      {!isLoading &&
+        !error &&
+        filteredContacts.length > 0 &&
+        filteredContacts.map(filteredContact => (
+          <ContactListItem
+            key={filteredContact.id}
+            filteredContact={filteredContact}
+          />
+        ))}
     </ul>
   );
-}
-
-export default ContactList;
+};

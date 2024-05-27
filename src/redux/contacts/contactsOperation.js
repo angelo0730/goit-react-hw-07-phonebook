@@ -3,7 +3,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 
 // Please create your own personal backend for development with the UI service mockapi.io
 // REFERENCE: https://mockapi.io/
-axios.defaults.baseURL = 'https://mockapi.io/projects/664300df3c01a059ea211a13#';
+axios.defaults.baseURL = 'https://65e597c6d7f0758a76e6c681.mockapi.io';
 
 /*
  * GET @ /contacts

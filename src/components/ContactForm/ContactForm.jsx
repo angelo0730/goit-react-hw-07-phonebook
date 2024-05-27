@@ -1,92 +1,79 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import css from './ContactForm.module.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { addContact } from '../../redux/contactsSlice';
-import Notiflix from 'notiflix';
-import { ReactComponent as AddIcon } from '../icons/plus-user.svg';
-import { Form, Input, Text, Button } from './ContactForm.styled';
+import { addContact } from '../../redux/contacts/contactsOperation';
+import { selectContacts } from '../../redux/contacts/contactsSelector';
 
-function ContactForm() {
+export const ContactForm = () => {
   const dispatch = useDispatch();
-  const contacts = useSelector(state => state.contacts);
+  const contacts = useSelector(selectContacts);
 
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 
-  const handleNameChange = event => {
-    setName(event.target.value);
+  const handleNameChange = e => {
+    setName(e.target.value);
   };
 
-  const handleNumberChange = event => {
-    setNumber(event.target.value);
+  const handleNumberChange = e => {
+    setNumber(e.target.value);
   };
 
-  const handleSubmit = event => {
-    event.preventDefault();
+  const handleSubmit = e => {
+    e.preventDefault();
 
     if (name.trim() === '' || number.trim() === '') {
       return;
     }
 
-    const isContactExist = contacts.find(
+    const existingContact = contacts.find(
       contact => contact.name.toLowerCase() === name.toLowerCase()
     );
-
-    if (isContactExist) {
-      Notiflix.Report.warning(
-        'Alert',
-        `Contact with name ${name} already exists!`,
-        'Ok'
-      );
+    if (existingContact) {
+      alert(`${name} is already in contacts!`);
       return;
     }
 
-    const isNumberExist = contacts.find(
-      contact => contact.number.replace(/\D/g, '') === number.replace(/\D/g, '')
-    );
+    // dispatch(addContact({ name: name, number: number }));
+    dispatch(addContact({ name, number }));
 
-    if (isNumberExist) {
-      Notiflix.Report.warning(
-        'Alert',
-        `Number ${number} is already in contacts!`,
-        'Ok'
-      );
-      return;
-    }
-
-    dispatch(addContact(name, number));
+    // Reset Form Fields upon submitting
     setName('');
     setNumber('');
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <Text>Name</Text>
-      <Input
-        type="text"
-        name="name"
-        pattern="^[a-zA-Zа-яА-Я]+([' \-][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*$"
-        title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-        required
-        value={name}
-        onChange={handleNameChange}
-      />
+    <form className={css.form} onSubmit={handleSubmit}>
+      <label className={css.formField}>
+        <p className={css.formLabel}>Name</p>
+        <input
+          type="text"
+          name="name"
+          // add \ before - in [' \-] to make it work (LMS)
+          pattern="^[a-zA-Zа-яА-Я]+(([' \-][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+          title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan."
+          required
+          value={name}
+          onChange={handleNameChange}
+        />
+      </label>
 
-      <Text>Number</Text>
-      <Input
-        type="tel"
-        name="number"
-        pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-        title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-        required
-        value={number}
-        onChange={handleNumberChange}
-      />
-
-      <Button type="submit">
-        <AddIcon />
-      </Button>
-    </Form>
+      <label className={css.formField}>
+        <p className={css.formLabel}>Number</p>
+        <input
+          type="tel"
+          name="number"
+          // add \ before - in [\-.\s] to make it work (LMS)
+          pattern="\+?\d{1,4}?[\-.\s]?\(?\d{1,3}?\)?[\-.\s]?\d{1,4}[\-.\s]?\d{1,4}[\-.\s]?\d{1,9}"
+          title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
+          required
+          value={number}
+          onChange={handleNumberChange}
+        />
+      </label>
+      <button className={css.formButton} type="submit">
+        Add Contact
+      </button>
+    </form>
   );
-}
-
-export default ContactForm;
+};
