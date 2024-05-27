@@ -1,16 +1,18 @@
-import { ContactForm } from './ContactForm/ContactForm';
-import { Filter } from './Filter/Filter';
-import { ContactList } from './ContactList/ContactList';
-import './App.css';
+import ContactForm from './ContactForm/ContactForm';
+import ContactList from './ContactList/ContactList';
+import Filter from './Filter/Filter';
+import { Container, Title, Heading2 } from './App.styled';
 
-export const App = () => {
+function App() {
   return (
-    <div className="container">
-      <h1>Phonebook📱</h1>
+    <Container>
+      <Title>Phonebook📱</Title>
       <ContactForm />
-      <h2>Contacts</h2>
+      <Heading2>Contacts</Heading2>
       <Filter />
       <ContactList />
-    </div>
+    </Container>
   );
-};
+}
+
+export default App;
